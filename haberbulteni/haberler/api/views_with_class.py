@@ -2,10 +2,25 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from haberler.models import Makale
-from haberler.api.serializer import MakaleSerializer
+from haberler.models import Makale, Gazeteci
+from haberler.api.serializer import MakaleSerializer, GazateciSerialzier
 
 from rest_framework.generics import _get_object_or_404
+
+
+class GazeteciListCreateAPIView(APIView):
+    def get(self, request):
+        yazarlar = Gazeteci.objects.all()
+        serializer = GazateciSerialzier(
+            yazarlar, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = GazateciSerialzier(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MakaleListCreateAPIView(APIView):

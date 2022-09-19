@@ -1,7 +1,7 @@
-from dataclasses import field
+from dataclasses import field, fields
 from pprint import pprint
 from rest_framework import serializers
-from haberler.models import Makale
+from haberler.models import Gazeteci, Makale
 
 from datetime import datetime
 from datetime import date
@@ -10,6 +10,8 @@ from django.utils.timesince import timesince
 
 class MakaleSerializer(serializers.ModelSerializer):
     time_since_pub = serializers.SerializerMethodField()
+    # yazar=serializers.StringRelatedField()
+    # yazar = GazateciSerialzier()
 
     class Meta:
         model = Makale
@@ -42,30 +44,41 @@ class MakaleSerializer(serializers.ModelSerializer):
             return attrs
 
 
-class MakaleDefaultSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    yazar = serializers.CharField()
-    baslik = serializers.CharField()
-    aciklama = serializers.CharField()
-    metin = serializers.CharField()
-    sehir = serializers.CharField()
-    yayımlanma_tarihi = serializers.DateField()
-    aktif = serializers.BooleanField()
-    yaratilma_tarihi = serializers.DateTimeField(read_only=True)
-    güncelleneme_tarihi = serializers.DateTimeField(read_only=True)
+class GazateciSerialzier(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        print(validated_data)
-        return Makale.objects.create(**validated_data)
+    # makaleler=MakaleSerializer(many=True,read_only=True)
+    makaleler = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name='makale-detay')
 
-    def update(self, instance, validated_data):
-        instance.yazar = validated_data.get('yazar', instance.yazar)
-        instance.baslik = validated_data.get('baslik', instance.baslik)
-        instance.aciklama = validated_data.get('aciklama', instance.aciklama)
-        instance.metin = validated_data.get('metin', instance.metin)
-        instance.sehir = validated_data.get('sehir', instance.sehir)
-        instance.yayımlanma_tarihi = validated_data.get(
-            'yayımlanma_tarihi', instance.yayımlanma_tarihi)
-        instance.aktif = validated_data.get('aktif', instance.aktif)
-        instance.save()
-        return instance
+    class Meta:
+        model = Gazeteci
+        fields = "__all__"
+
+
+# class MakaleDefaultSerializer(serializers.Serializer):
+#     id = serializers.IntegerField(read_only=True)
+#     yazar = serializers.CharField()
+#     baslik = serializers.CharField()
+#     aciklama = serializers.CharField()
+#     metin = serializers.CharField()
+#     sehir = serializers.CharField()
+#     yayımlanma_tarihi = serializers.DateField()
+#     aktif = serializers.BooleanField()
+#     yaratilma_tarihi = serializers.DateTimeField(read_only=True)
+#     güncelleneme_tarihi = serializers.DateTimeField(read_only=True)
+
+#     def create(self, validated_data):
+#         print(validated_data)
+#         return Makale.objects.create(**validated_data)
+
+#     def update(self, instance, validated_data):
+#         instance.yazar = validated_data.get('yazar', instance.yazar)
+#         instance.baslik = validated_data.get('baslik', instance.baslik)
+#         instance.aciklama = validated_data.get('aciklama', instance.aciklama)
+#         instance.metin = validated_data.get('metin', instance.metin)
+#         instance.sehir = validated_data.get('sehir', instance.sehir)
+#         instance.yayımlanma_tarihi = validated_data.get(
+#             'yayımlanma_tarihi', instance.yayımlanma_tarihi)
+#         instance.aktif = validated_data.get('aktif', instance.aktif)
+#         instance.save()
+#         return instance

@@ -5,6 +5,8 @@ from haberler.api import views_with_class as API_Views_Class
 
 
 urlpatterns = [
+    path('yazarlar/', API_Views_Class.GazeteciListCreateAPIView.as_view(),
+         name='yazarlar-listesi'),
     path('makaleler/', API_Views_Class.MakaleListCreateAPIView.as_view(),
          name='makale-listesi'),
     path('makaleler/<int:pk>',
